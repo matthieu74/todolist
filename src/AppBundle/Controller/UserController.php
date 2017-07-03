@@ -56,9 +56,17 @@ class UserController extends Controller
         if ($form->isValid()) {
             $password = $this->get('security.password_encoder')->encodePassword($user, $user->getPassword());
             $user->setPassword($password);
+            
+            $role = $form->get('roles')->getData();
+            $roles = [];
+            foreach ($role as $key => $value) {
+            	$roles[] = $value;
+            }
+            $user->setRoles($roles);
 
             $this->getDoctrine()->getManager()->flush();
 
+            return var_dump($roles);
             $this->addFlash('success', "L'utilisateur a bien été modifié");
 
             return $this->redirectToRoute('user_list');
