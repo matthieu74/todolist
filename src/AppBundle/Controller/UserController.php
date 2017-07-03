@@ -32,6 +32,13 @@ class UserController extends Controller
             $em = $this->getDoctrine()->getManager();
             $password = $this->get('security.password_encoder')->encodePassword($user, $user->getPassword());
             $user->setPassword($password);
+            
+            $role = $form->get('roles')->getData();
+            $roles = [];
+            foreach ($role as $key => $value) {
+            	$roles[] = $value;
+            }
+            $user->setRoles($roles);
 
             $em->persist($user);
             $em->flush();
