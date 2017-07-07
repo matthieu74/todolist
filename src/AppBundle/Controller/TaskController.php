@@ -86,12 +86,35 @@ class TaskController extends Controller
      */
     public function deleteTaskAction(Task $task)
     {
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($task);
-        $em->flush();
-
-        $this->addFlash('success', 'La tâche a bien été supprimée.');
-
-        return $this->redirectToRoute('task_list');
+    	$canDelete = false;
+    	$user  = $this->container->get('security.token_storage')->getToken()->getUser();
+    	if ($task->getUser() &&  $task->getUser() === $user)
+    	{
+    		$canDelete = true;
+    	}
+    	else
+    	{
+    		if ($this->get('security.authorization_checker')->isGranted('ROLE_ADMIN'))
+    		{
+    			$canDelete = true;
+    		}
+    	}
+    	
+    	if ($canDelete)
+    	{
+    		/*$em = $this->getDoctrine()->getManager();
+    		$em->remove($task);
+    		$em->flush();*/
+    		
+    		$this->addFlash('success', 'La tâche a bien été supprimée.');
+    		
+    		return $this->redirectToRoute('task_list');
+    	}
+    	else
+    	{
+    		$this->addFlash('success', 'Droit insuffisant pour supprimer la tâche.');
+    		
+    		return $this->redirectToRoute('task_list');
+    	}
     }
 }

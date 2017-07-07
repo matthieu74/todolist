@@ -21,12 +21,24 @@
                 <div>
                     <form action="{{ path('task_toggle', {'id' : task.id }) }}">
                         <button class="btn btn-success btn-sm pull-right">
-                            {% if not task.isDone %}Marquer comme faite{% else %}Marquer non terminÃ©e{% endif %}
+                            {% if not task.isDone %}Marquer comme faite{% else %}Marquer non terminée{% endif %}
                         </button>
                     </form>
-                    <form action="{{ path('task_delete', {'id' : task.id }) }}">
-                        <button class="btn btn-danger btn-sm pull-right">Supprimer</button>
-                    </form>
+                    {% if is_granted("ROLE_USER") %}
+                    	 {% if task.user %}
+                            {% if task.user == app.user %}
+                            <form action="{{ path('task_delete', {'id' : task.id }) }}">
+                                <button class="btn btn-danger btn-sm pull-right">Supprimer</button>
+                            </form>
+                            {% endif %}
+                        {% else %}
+                            {% if is_granted("ROLE_ADMIN") %}
+                                 <form action="{{ path('task_delete', {'id' : task.id }) }}">
+                                    <button class="btn btn-danger btn-sm pull-right">Supprimer</button>
+                                </form>
+                            {% endif %}
+                        {% endif %}
+                     {% endif %}
                 </div>
             </div>
         </div>
