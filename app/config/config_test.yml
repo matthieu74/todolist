@@ -10,9 +10,9 @@ framework:
 doctrine:
     dbal:
         host:     127.0.0.1
-        dbname:   todolist_test
-        user:     root
-        password: null
+        dbname:   
+        user:     
+        password: 
 web_profiler:
     toolbar: false
     intercept_redirects: false
