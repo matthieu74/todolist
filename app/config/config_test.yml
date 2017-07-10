@@ -7,7 +7,12 @@ framework:
         storage_id: session.storage.mock_file
     profiler:
         collect: false
-
+doctrine:
+    dbal:
+        host:     127.0.0.1
+        dbname:   todolist_test
+        user:     root
+        password: null
 web_profiler:
     toolbar: false
     intercept_redirects: false
