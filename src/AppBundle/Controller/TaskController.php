@@ -102,9 +102,9 @@ class TaskController extends Controller
     	
     	if ($canDelete)
     	{
-    		/*$em = $this->getDoctrine()->getManager();
+    		$em = $this->getDoctrine()->getManager();
     		$em->remove($task);
-    		$em->flush();*/
+    		$em->flush();
     		
     		$this->addFlash('success', 'La tâche a bien été supprimée.');
     		
