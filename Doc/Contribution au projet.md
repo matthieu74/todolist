@@ -9,4 +9,4 @@ Avant de travailler sur le projet TodoList veuillez lire les documents suivants:
 
 [0]:getEtGithub.md
 [1]:tests.md
-[2]:formatage du code.md
+[2]:formatage_du_code.md'
