@@ -11,4 +11,4 @@ Avant de travailler sur le projet TodoList veuillez lire les documents suivants:
 [0]:getEtGithub.md
 [1]:tests.md
 [2]:perfomance.md
-[3]:formatage_du_code.md'
+[3]:conventions.md
