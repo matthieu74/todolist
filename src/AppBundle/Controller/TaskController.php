@@ -16,8 +16,7 @@ class TaskController extends Controller
     public function listAction()
     {
     	$cachedTasks = $this->get('cache.app')->getItem('tasks');
-    	
-    	
+    	    	
     	if (!$cachedTasks->isHit()) {
     		$tasks = array('tasks' => $this->getDoctrine()->getRepository('AppBundle:Task')->findAll());
     		$cachedTasks->set($tasks);
@@ -41,8 +40,7 @@ class TaskController extends Controller
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
 
-            $user  = $this->container->get('security.token_storage')->getToken()->getUser();
-            $task->setUser($user);
+            $task->setUser($this->container->get('security.token_storage')->getToken()->getUser());
             $em->persist($task);
             $em->flush();
             $this->get('cache.app')->deleteItem('tasks');
@@ -96,28 +94,20 @@ class TaskController extends Controller
      */
     public function deleteTaskAction(Task $task)
     {
-        $canDelete = false;
-        $user  = $this->container->get('security.token_storage')->getToken()->getUser();
-        if ($task->getUser() &&  $task->getUser() === $user) {
-            $canDelete = true;
+        if (($task->getUser() &&  $task->getUser() === $this->container->get('security.token_storage')->getToken()->getUser()) 
+        		|| ($this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')))
+        {
+        	$em = $this->getDoctrine()->getManager();
+        	$em->remove($task);
+        	$em->flush();
+        	$this->get('cache.app')->deleteItem('tasks');
+        	$this->addFlash('success', 'La tâche a bien été supprimée.');
+        	
+        	return $this->redirectToRoute('task_list');
         } else {
-            if ($this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
-                $canDelete = true;
-            }
-        }
-        
-        if ($canDelete) {
-            $em = $this->getDoctrine()->getManager();
-    		$em->remove($task);
-    		$em->flush();
-    		$this->get('cache.app')->deleteItem('tasks');
-            $this->addFlash('success', 'La tâche a bien été supprimée.');
-            
-            return $this->redirectToRoute('task_list');
-        } else {
-            $this->addFlash('success', 'Droit insuffisant pour supprimer la tâche.');
-            
-            return $this->redirectToRoute('task_list');
+        	$this->addFlash('success', 'Droit insuffisant pour supprimer la tâche.');
+        	
+        	return $this->redirectToRoute('task_list');
         }
     }
 }
