@@ -100,11 +100,11 @@ class Task
     
     public function getUser()
     {
-    	return $this->user;
+        return $this->user;
     }
     
     public function setUser($user)
     {
-    	$this->user = $user;
+        $this->user = $user;
     }
 }

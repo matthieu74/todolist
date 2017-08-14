@@ -86,17 +86,17 @@ class User implements UserInterface
 
     public function getRoles()
     {
-    	$roles = $this->roles;
-    	// give everyone ROLE_USER!
-    	if (!in_array('ROLE_USER', $roles)) {
-    		$roles[] = 'ROLE_USER';
-    	}
-    	return $roles;
+        $roles = $this->roles;
+        // give everyone ROLE_USER!
+        if (!in_array('ROLE_USER', $roles)) {
+            $roles[] = 'ROLE_USER';
+        }
+        return $roles;
     }
     
     public function setRoles(array $roles)
     {
-    	$this->roles = $roles;
+        $this->roles = $roles;
     }
     public function eraseCredentials()
     {
