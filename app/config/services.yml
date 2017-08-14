@@ -14,6 +14,11 @@ services:
         # if you need to do this, you can override this setting on individual services
         public: false
 
+    task_service:
+        class: AppBundle\Services\TaskService
+        arguments: [ "@doctrine.orm.entity_manager" , "@service_container" ]
+
+
     # makes classes in src/AppBundle available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     AppBundle\:

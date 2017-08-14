@@ -3,7 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Task;
-use AppBundle\Form\TaskType;
+use AppBundle\Form\Type\TaskType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,9 +15,9 @@ class TaskController extends Controller
      */
     public function listAction()
     {
-    	$array = array('tasks' => $this->getDoctrine()->getRepository('AppBundle:Task')->findAll());
-    	
-    	return $this->render('task/list.html.twig', $array);
+        $array = array('tasks' => $this->getDoctrine()->getRepository('AppBundle:Task')->findAll());
+        
+        return $this->render('task/list.html.twig', $array);
     }
 
     /**
@@ -29,7 +29,7 @@ class TaskController extends Controller
         $form = $this->createForm(TaskType::class, $task);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
 
             $user  = $this->container->get('security.token_storage')->getToken()->getUser();
@@ -54,7 +54,7 @@ class TaskController extends Controller
 
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $this->getDoctrine()->getManager()->flush();
 
             $this->addFlash('success', 'La tâche a bien été modifiée.');
@@ -86,35 +86,28 @@ class TaskController extends Controller
      */
     public function deleteTaskAction(Task $task)
     {
-    	$canDelete = false;
-    	$user  = $this->container->get('security.token_storage')->getToken()->getUser();
-    	if ($task->getUser() &&  $task->getUser() === $user)
-    	{
-    		$canDelete = true;
-    	}
-    	else
-    	{
-    		if ($this->get('security.authorization_checker')->isGranted('ROLE_ADMIN'))
-    		{
-    			$canDelete = true;
-    		}
-    	}
-    	
-    	if ($canDelete)
-    	{
-    		$em = $this->getDoctrine()->getManager();
+        $canDelete = false;
+        $user  = $this->container->get('security.token_storage')->getToken()->getUser();
+        if ($task->getUser() &&  $task->getUser() === $user) {
+            $canDelete = true;
+        } else {
+            if ($this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
+                $canDelete = true;
+            }
+        }
+        
+        if ($canDelete) {
+            /*$em = $this->getDoctrine()->getManager();
     		$em->remove($task);
-    		$em->flush();
-    		
-    		$this->addFlash('success', 'La tâche a bien été supprimée.');
-    		
-    		return $this->redirectToRoute('task_list');
-    	}
-    	else
-    	{
-    		$this->addFlash('success', 'Droit insuffisant pour supprimer la tâche.');
-    		
-    		return $this->redirectToRoute('task_list');
-    	}
+    		$em->flush();*/
+            
+            $this->addFlash('success', 'La tâche a bien été supprimée.');
+            
+            return $this->redirectToRoute('task_list');
+        } else {
+            $this->addFlash('success', 'Droit insuffisant pour supprimer la tâche.');
+            
+            return $this->redirectToRoute('task_list');
+        }
     }
 }

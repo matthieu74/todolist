@@ -3,8 +3,8 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\User;
-use AppBundle\Form\UserEditType;
-use AppBundle\Form\UserType;
+use AppBundle\Form\Type\UserEditType;
+use AppBundle\Form\Type\UserType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,7 +29,7 @@ class UserController extends Controller
 
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
             $password = $this->get('security.password_encoder')->encodePassword($user, $user->getPassword());
             $user->setPassword($password);
@@ -37,7 +37,7 @@ class UserController extends Controller
             $role = $form->get('roles')->getData();
             $roles = [];
             foreach ($role as $key => $value) {
-            	$roles[] = $value;
+                $roles[] = $value;
             }
             $user->setRoles($roles);
 
@@ -61,12 +61,11 @@ class UserController extends Controller
 
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
-
+        if ($form->isSubmitted() && $form->isValid()) {
             $role = $form->get('roles')->getData();
             $roles = [];
             foreach ($role as $key => $value) {
-            	$roles[] = $value;
+                $roles[] = $value;
             }
             $user->setRoles($roles);
 
