@@ -15,9 +15,18 @@ class TaskController extends Controller
      */
     public function listAction()
     {
-        $array = array('tasks' => $this->getDoctrine()->getRepository('AppBundle:Task')->findAll());
-        
-        return $this->render('task/list.html.twig', $array);
+    	$cachedTasks = $this->get('cache.app')->getItem('tasks');
+    	
+    	
+    	if (!$cachedTasks->isHit()) {
+    		$tasks = array('tasks' => $this->getDoctrine()->getRepository('AppBundle:Task')->findAll());
+    		$cachedTasks->set($tasks);
+    		$this->get('cache.app')->save($cachedTasks);
+    	} else {
+    		$tasks = $cachedTasks->get();
+    	}
+    	
+        return $this->render('task/list.html.twig', $tasks);
     }
 
     /**
@@ -36,7 +45,7 @@ class TaskController extends Controller
             $task->setUser($user);
             $em->persist($task);
             $em->flush();
-
+            $this->get('cache.app')->deleteItem('tasks');
             $this->addFlash('success', 'La tâche a été bien été ajoutée.');
 
             return $this->redirectToRoute('task_list');
@@ -56,6 +65,7 @@ class TaskController extends Controller
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getDoctrine()->getManager()->flush();
+            $this->get('cache.app')->deleteItem('tasks');
 
             $this->addFlash('success', 'La tâche a bien été modifiée.');
 
@@ -75,7 +85,7 @@ class TaskController extends Controller
     {
         $task->toggle(!$task->isDone());
         $this->getDoctrine()->getManager()->flush();
-
+        $this->get('cache.app')->deleteItem('tasks');
         $this->addFlash('success', sprintf('La tâche %s a bien été marquée comme faite.', $task->getTitle()));
 
         return $this->redirectToRoute('task_list');
@@ -97,10 +107,10 @@ class TaskController extends Controller
         }
         
         if ($canDelete) {
-            /*$em = $this->getDoctrine()->getManager();
+            $em = $this->getDoctrine()->getManager();
     		$em->remove($task);
-    		$em->flush();*/
-            
+    		$em->flush();
+    		$this->get('cache.app')->deleteItem('tasks');
             $this->addFlash('success', 'La tâche a bien été supprimée.');
             
             return $this->redirectToRoute('task_list');
