@@ -42,7 +42,8 @@ class TodoListRepositoryTest extends KernelTestCase
     {
         $task = new Task();
         $task->setTitle('test Mock');
-
+        $now = new \DateTime();
+        $task->setCreatedAt($now);
         $taskRepository = $this->createMock(ObjectRepository::class);
 
         $taskRepository->expects($this->any())
@@ -54,6 +55,18 @@ class TodoListRepositoryTest extends KernelTestCase
             'test Mock',
             $taskEm->getTitle()
         );
+        $this->assertSame(
+        		$now,
+        		$taskEm->getCreatedAt()
+        );
+        
+        $taskEm->toggle(true);
+        
+        $this->assertSame(
+        		true,
+        		$taskEm->isDone()
+        		);
+        
 
     }
 }
