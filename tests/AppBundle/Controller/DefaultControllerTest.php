@@ -3,7 +3,6 @@
 namespace Tests\AppBundle\Controller;
 
 use AppBundle\Form\TaskType;
-use AppBundle\Entity\Task;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class DefaultControllerTest extends WebTestCase
@@ -49,8 +48,8 @@ class DefaultControllerTest extends WebTestCase
         //create a task
         $crawler = $client->request('GET', '/tasks/create');
         $dataTask = array(
-            'task[title]' => 'test task',
-            'task[content]' => 'cree pour des tests',
+            'task[title]' => 'test phpunit task',
+            'task[content]' => 'cree via phpuni',
         );
         $formTask = $crawler->selectButton('Ajouter')->form();
         $crawler = $client->submit($formTask,$dataTask );
@@ -178,7 +177,7 @@ class DefaultControllerTest extends WebTestCase
     }
 
 
-    public function testUserFuncitonAsUser()
+    public function testUserFunctionAsUser()
     {
         $formLogin = array(
             '_username' => 'user',
@@ -201,4 +200,7 @@ class DefaultControllerTest extends WebTestCase
 
         $crawler = $client->request('GET', '/logout');
     }
+
+
+
 }
