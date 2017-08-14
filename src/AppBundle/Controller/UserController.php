@@ -16,7 +16,18 @@ class UserController extends Controller
      */
     public function listAction()
     {
-        return $this->render('user/list.html.twig', ['users' => $this->getDoctrine()->getRepository('AppBundle:User')->findAll()]);
+    	
+    	$cachedUsers = $this->get('cache.app')->getItem('users');
+    	    
+    	if (!$cachedUsers->isHit()) {
+    		$users= array('users' => $this->getDoctrine()->getRepository('AppBundle:User')->findAll());
+    		$cachedUsers->set($users);
+    		$this->get('cache.app')->save($cachedUsers);
+    	} else {
+    		$users= $cachedUsers->get();
+    	}
+    	
+    	return $this->render('user/list.html.twig', $users);
     }
 
     /**
@@ -43,7 +54,7 @@ class UserController extends Controller
 
             $em->persist($user);
             $em->flush();
-
+            $this->get('cache.app')->deleteItem('users');
             $this->addFlash('success', "L'utilisateur a bien été ajouté.");
 
             return $this->redirectToRoute('user_list');
@@ -70,7 +81,7 @@ class UserController extends Controller
             $user->setRoles($roles);
 
             $this->getDoctrine()->getManager()->flush();
-
+            $this->get('cache.app')->deleteItem('users');
             $this->addFlash('success', "L'utilisateur a bien été modifié");
 
             return $this->redirectToRoute('user_list');
