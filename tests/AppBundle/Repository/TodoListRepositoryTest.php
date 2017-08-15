@@ -27,10 +27,10 @@ class TodoListRepositoryTest extends KernelTestCase
 
     public function testEntityTask()
     {
-        $task = $this->em->getRepository('AppBundle:Task')->find(5);
+        $task = $this->em->getRepository('AppBundle:Task')->find(6);
 
 
-        $this->assertContains('tache super simple', $task->getContent());
+        $this->assertContains('penible', $task->getContent());
 
         $task->setContent('tache super simple modifier par phpuni');
         $this->em->persist($task);
