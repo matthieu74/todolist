@@ -25,7 +25,8 @@ class TaskController extends Controller
     		$tasks = $cachedTasks->get();
     	}
     	
-        return $this->render('task/list.html.twig', $tasks);
+        return $this->render('task/list.html.twig', $tasks
+        );
     }
 
     /**
@@ -92,22 +93,27 @@ class TaskController extends Controller
     /**
      * @Route("/tasks/{id}/delete", name="task_delete")
      */
-    public function deleteTaskAction(Task $task)
+    public function deleteTaskAction(Task $task, Request $request)
     {
-        if (($task->getUser() &&  $task->getUser() === $this->container->get('security.token_storage')->getToken()->getUser()) 
-        		|| ($this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')))
-        {
-        	$em = $this->getDoctrine()->getManager();
-        	$em->remove($task);
-        	$em->flush();
-        	$this->get('cache.app')->deleteItem('tasks');
-        	$this->addFlash('success', 'La tâche a bien été supprimée.');
-        	
-        	return $this->redirectToRoute('task_list');
-        } else {
-        	$this->addFlash('success', 'Droit insuffisant pour supprimer la tâche.');
-        	
-        	return $this->redirectToRoute('task_list');
-        }
+    	
+    	if ($this->isCsrfTokenValid('authenticate',  $request->get('_csrf_token')))
+    	{
+	        if (($task->getUser() &&  $task->getUser() === $this->container->get('security.token_storage')->getToken()->getUser()) 
+	        		|| ($this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')))
+	        {
+	        	$em = $this->getDoctrine()->getManager();
+	        	$em->remove($task);
+	        	$em->flush();
+	        	$this->get('cache.app')->deleteItem('tasks');
+	        	$this->addFlash('success', 'La tâche a bien été supprimée.');
+	        	
+	        	return $this->redirectToRoute('task_list');
+	        } else {
+	        	$this->addFlash('success', 'Droit insuffisant pour supprimer la tâche.');
+	        	
+	        	return $this->redirectToRoute('task_list');
+	        }
+    	}
+    	return $this->redirectToRoute('task_list');
     }
 }
