@@ -15,20 +15,26 @@ class TaskController extends Controller
      */
     public function listAction()
     {
-    	$cachedTasks = $this->get('cache.app')->getItem('tasks');
-    	    	
-    	if (!$cachedTasks->isHit()) {
-    		$tasks = array('tasks' => $this->getDoctrine()->getRepository('AppBundle:Task')->findAll());
-    		$cachedTasks->set($tasks);
-    		$this->get('cache.app')->save($cachedTasks);
-    	} else {
-    		$tasks = $cachedTasks->get();
-    	}
-    	
-        return $this->render('task/list.html.twig', $tasks
-        );
+    	return $this->render('task/list.html.twig', $this->getTasks('tasks'));
+    }
+    
+    /**
+     * @Route("/tasks/open", name="open_task_list")
+     */
+    public function openListAction()
+    {
+    	return $this->render('task/list.html.twig', $this->getTasks('openTasks'));
+    }
+    
+    /**
+     * @Route("/tasks/close", name="close_task_list")
+     */
+    public function closeListAction()
+    {
+    	return $this->render('task/list.html.twig', $this->getTasks('closeTasks'));
     }
 
+    
     /**
      * @Route("/tasks/create", name="task_create")
      */
@@ -44,7 +50,7 @@ class TaskController extends Controller
             $task->setUser($this->container->get('security.token_storage')->getToken()->getUser());
             $em->persist($task);
             $em->flush();
-            $this->get('cache.app')->deleteItem('tasks');
+            $this->cleanCache();
             $this->addFlash('success', 'La tâche a été bien été ajoutée.');
 
             return $this->redirectToRoute('task_list');
@@ -64,7 +70,7 @@ class TaskController extends Controller
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getDoctrine()->getManager()->flush();
-            $this->get('cache.app')->deleteItem('tasks');
+            $this->cleanCache();
 
             $this->addFlash('success', 'La tâche a bien été modifiée.');
 
@@ -84,7 +90,7 @@ class TaskController extends Controller
     {
         $task->toggle(!$task->isDone());
         $this->getDoctrine()->getManager()->flush();
-        $this->get('cache.app')->deleteItem('tasks');
+        $this->cleanCache();
         $this->addFlash('success', sprintf('La tâche %s a bien été marquée comme faite.', $task->getTitle()));
 
         return $this->redirectToRoute('task_list');
@@ -104,7 +110,7 @@ class TaskController extends Controller
 	        	$em = $this->getDoctrine()->getManager();
 	        	$em->remove($task);
 	        	$em->flush();
-	        	$this->get('cache.app')->deleteItem('tasks');
+	        	$this->cleanCache();
 	        	$this->addFlash('success', 'La tâche a bien été supprimée.');
 	        	
 	        	return $this->redirectToRoute('task_list');
@@ -115,5 +121,34 @@ class TaskController extends Controller
 	        }
     	}
     	return $this->redirectToRoute('task_list');
+    }
+    
+    private function getTasks($cacheName)
+    {
+    	$cachedTasks = $this->get('cache.app')->getItem($cacheName);
+    	
+    	if (!$cachedTasks->isHit()) {
+    		if ($cacheName == 'tasks'){
+    			$tasks = array('tasks' => $this->getDoctrine()->getRepository('AppBundle:Task')->findAll());
+    		}
+    		else if ($cacheName == 'openTasks'){
+    			$tasks = array('tasks' => $this->getDoctrine()->getRepository('AppBundle:Task')->findOpen(false));
+    		}
+    		else {
+    			$tasks = array('tasks' => $this->getDoctrine()->getRepository('AppBundle:Task')->findOpen(true));
+    		}
+    		$cachedTasks->set($tasks);
+    		$this->get('cache.app')->save($cachedTasks);
+    	} else {
+    		$tasks = $cachedTasks->get();
+    	}
+    	return $tasks;
+    }
+    
+    private function cleanCache()
+    {
+    	$this->get('cache.app')->deleteItem('tasks');
+    	$this->get('cache.app')->deleteItem('openTasks');
+    	$this->get('cache.app')->deleteItem('closeTasks');
     }
 }
