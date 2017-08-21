@@ -49,6 +49,8 @@ class TodoListRepositoryTest extends KernelTestCase
         $taskRepository->expects($this->any())
             ->method('find')
             ->willReturn($task);
+			
+		$task->setUser(null);
 
         $taskEm = $taskRepository->find(1);
         $this->assertContains(
