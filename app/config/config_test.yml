@@ -10,8 +10,9 @@ framework:
 doctrine:
     dbal:
         host:     127.0.0.1
-        dbname:   
-        user:     
+        dbname: todolist_test  
+        user: root
+
         password: 
 web_profiler:
     toolbar: false

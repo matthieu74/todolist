@@ -45,6 +45,20 @@ class DefaultControllerTest extends WebTestCase
             'tache non rattachee',
             $client->getResponse()->getContent()
         );
+		
+		 $crawler = $client->request('GET', '/tasks/open');
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertContains(
+            'tache non rattachee',
+            $client->getResponse()->getContent()
+        );
+		
+		 $crawler = $client->request('GET', '/tasks/close');
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertContains(
+            'tache finie',
+            $client->getResponse()->getContent()
+        );
 
 
         //create a task

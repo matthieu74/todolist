@@ -86,13 +86,14 @@ class TaskController extends Controller
     /**
      * @Route("/tasks/{id}/toggle", name="task_toggle")
      */
-    public function toggleTaskAction(Task $task)
+    public function toggleTaskAction(Task $task, Request $request)
     {
-        $task->toggle(!$task->isDone());
-        $this->getDoctrine()->getManager()->flush();
-        $this->cleanCache();
-        $this->addFlash('success', sprintf('La tâche %s a bien été marquée comme faite.', $task->getTitle()));
-
+        if ($this->isCsrfTokenValid('authenticate',  $request->get('_csrf_token'))) {
+            $task->toggle(!$task->isDone());
+            $this->getDoctrine()->getManager()->flush();
+            $this->cleanCache();
+            $this->addFlash('success', sprintf('La tâche %s a bien été marquée comme faite.', $task->getTitle()));
+        }
         return $this->redirectToRoute('task_list');
     }
 
@@ -101,7 +102,6 @@ class TaskController extends Controller
      */
     public function deleteTaskAction(Task $task, Request $request)
     {
-    	
     	if ($this->isCsrfTokenValid('authenticate',  $request->get('_csrf_token')))
     	{
 	        if (($task->getUser() &&  $task->getUser() === $this->container->get('security.token_storage')->getToken()->getUser()) 
