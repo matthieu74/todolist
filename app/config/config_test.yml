@@ -12,7 +12,6 @@ doctrine:
         host:     127.0.0.1
         dbname: todolist_test  
         user: root
-
         password: 
 web_profiler:
     toolbar: false
